@@ -61,7 +61,10 @@ class _MainState extends State<Main> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           var datas = snapshot.data!.docs;
+
           if (datas.isEmpty) {
+            return const Text('nothing');
+          } else {
             return CustomRadioButton(
               elevation: 0,
               absoluteZeroSpacing: true,
