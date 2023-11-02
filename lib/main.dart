@@ -59,7 +59,7 @@ class _MainState extends State<Main> {
     categoryList = FutureBuilder(
       future: result,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot != snapshot.hasData) {
           var datas = snapshot.data!.docs;
 
           if (datas.isEmpty) {
