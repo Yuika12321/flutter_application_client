@@ -62,9 +62,7 @@ class _MainState extends State<Main> {
         if (snapshot.hasData) {
           var datas = snapshot.data!.docs;
           if (datas.isEmpty) {
-            return const Text('nothing');
-          } else {
-            CustomRadioButton(
+            return CustomRadioButton(
               elevation: 0,
               absoluteZeroSpacing: true,
               unSelectedColor: Theme.of(context).canvasColor,
