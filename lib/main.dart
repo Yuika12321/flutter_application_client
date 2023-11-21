@@ -1,9 +1,9 @@
+import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'firebase_options.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
+import 'firebase_options.dart';
 
 var db = FirebaseFirestore.instance;
 String categoryCollectionName = 'cafe_category';
@@ -76,7 +76,46 @@ class _MainState extends State<Main> {
                   unSelectedColor: Colors.black,
                   textStyle: TextStyle(fontSize: 16)),
               radioButtonValue: (value) {
-                print(value);
+                itemList = FutureBuilder(
+                  future: db
+                      .collection(categoryCollectionName)
+                      .where('categoryId', isEqualTo: value)
+                      .get(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData == true) {
+                      var items = snapshot.data!.docs;
+                      if (items.isEmpty) {
+                        // 아이템이 없는 경우
+                        return const Center(
+                          child: Text('empty'),
+                        );
+                      } else {
+                        // 아이템이 있는 경우
+                        List<Widget> lt = [];
+                        for (var item in items) {
+                          lt.add(Container(
+                            child: Column(children: [
+                              Text(
+                                item['itemName'],
+                              ),
+                              Text(
+                                item['itemPrice'],
+                              ),
+                            ]),
+                          ));
+                        }
+                        return Wrap(
+                          children: lt,
+                        );
+                      }
+                    } else {
+                      // 아직 데이터 로드 중
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
+                );
               },
               selectedColor: Theme.of(context).colorScheme.secondary,
             );
@@ -105,20 +144,24 @@ class _MainState extends State<Main> {
       appBar: AppBar(
         title: const Text('집가고싶다.'),
         actions: [
-          Badge(
-            label: const Text('1'),
-            child: IconButton(
-                onPressed: () {
-                  if (panelController.isPanelClosed) {
-                    panelController.open();
-                  } else {
-                    panelController.close();
-                  }
-                },
-                icon: const Icon(Icons.shopping_basket_sharp)),
+          Transform.translate(
+            offset: const Offset(-10, 10),
+            child: Badge(
+              label: const Text('1'),
+              child: IconButton(
+                  onPressed: () {
+                    if (panelController.isPanelClosed) {
+                      panelController.open();
+                    } else {
+                      panelController.close();
+                    }
+                  },
+                  icon: const Icon(Icons.shopping_basket_sharp)),
+            ),
           )
         ],
       ),
+      body: null,
     );
   }
 }
