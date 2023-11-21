@@ -40,6 +40,7 @@ dependencies:
   flutter_sliding_up_panel: ^2.1.1
   sliding_up_panel: ^2.0.0+1
   custom_radio_grouped_button: ^2.2.1
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
