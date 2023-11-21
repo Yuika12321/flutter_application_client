@@ -51,6 +51,10 @@ class _MainState extends State<Main> {
   // 장바구니 컨트롤러
   PanelController panelController = PanelController();
 
+  String toCurrency(int n) {
+    return '통화모습 숫자';
+  }
+
   // 카테고리 보기 기능
   Future<void> showCategoryList() async {
     // print(목록 출력 . . . .)
@@ -59,7 +63,7 @@ class _MainState extends State<Main> {
     categoryList = FutureBuilder(
       future: result,
       builder: (context, snapshot) {
-        if (snapshot != snapshot.hasData) {
+        if (snapshot.hasData == true) {
           var datas = snapshot.data!.docs;
 
           if (datas.isEmpty) {
@@ -99,7 +103,7 @@ class _MainState extends State<Main> {
                                 item['itemName'],
                               ),
                               Text(
-                                item['itemPrice'],
+                                item['itemPrice'].toString(),
                               ),
                             ]),
                           ));
@@ -142,7 +146,7 @@ class _MainState extends State<Main> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('집가고싶다.'),
+        title: const Text('qwerasdf'),
         actions: [
           Transform.translate(
             offset: const Offset(-10, 10),
@@ -161,7 +165,14 @@ class _MainState extends State<Main> {
           )
         ],
       ),
-      body: null,
+      body: SlidingUpPanel(
+        controller: panelController,
+        panel: Container(),
+        body: Column(children: [
+          categoryList,
+          Expanded(child: itemList),
+        ]),
+      ),
     );
   }
 }
