@@ -127,24 +127,32 @@ class _MainState extends State<Main> {
                   onTap: () {
                     int cnt = 1;
                     int price = item['itemPrice'];
+                    var optionData = {};
+                    var orderData = {};
 
                     //options 가공
                     List<dynamic> options = item['options'];
                     List<Widget> datas = [];
                     for (var option in options) {
                       var values = option['optionValue'].toString().split('\n');
-                      datas.add(Column(
-                        children: [
-                          Text(option['optionName']),
-                          CustomRadioButton(
-                              buttonLables: values,
-                              buttonValues: values,
-                              radioButtonValue: (p0) {
-                                print(p0);
-                              },
-                              unSelectedColor: Colors.white,
-                              selectedColor: Colors.teal),
-                        ],
+
+                      // oderData['샷'] = '1추';
+                      optionData[option['optionName']] = values[0];
+
+                      datas.add(ListTile(
+                        title: Text(option['optionName']),
+                        subtitle: CustomRadioButton(
+                            defaultSelected: values[0],
+                            enableButtonWrap: true,
+                            wrapAlignment: WrapAlignment.start,
+                            buttonLables: values,
+                            buttonValues: values,
+                            radioButtonValue: (p0) {
+                              optionData[option['optionName']] = p0;
+                              print(optionData);
+                            },
+                            unSelectedColor: Colors.white,
+                            selectedColor: Colors.teal),
                       ));
                     }
                     showDialog(
@@ -173,9 +181,18 @@ class _MainState extends State<Main> {
                                 content: Column(
                                   children: datas,
                                 ),
-                                actions: const [
-                                  Text('취소'),
-                                  Text('담기'),
+                                actions: [
+                                  const Text('취소'),
+                                  TextButton(
+                                    onPressed: () {
+                                      orderData['orderItem'] = item['itemName'];
+                                      orderData['orderQty'] = cnt;
+                                      orderData['options'] = optionData;
+
+                                      print(orderData);
+                                    },
+                                    child: const Text('담기'),
+                                  ),
                                 ],
                               );
                             }));
