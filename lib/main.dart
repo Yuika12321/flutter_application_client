@@ -1,3 +1,4 @@
+import 'package:cart_stepper/cart_stepper.dart';
 import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,9 +28,10 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      theme: ThemeData.light(useMaterial3: false),
       debugShowCheckedModeBanner: false,
-      home: Main(),
+      home: const Main(),
     );
   }
 }
@@ -71,6 +73,8 @@ class _MainState extends State<Main> {
             return const Text('nothing');
           } else {
             return CustomRadioButton(
+              enableButtonWrap: true,
+              wrapAlignment: WrapAlignment.start,
               defaultSelected: 'toAll',
               elevation: 0,
               absoluteZeroSpacing: true,
@@ -119,24 +123,63 @@ class _MainState extends State<Main> {
               // 아이템이 있는 경우
               List<Widget> lt = [];
               for (var item in items) {
-                lt.add(Container(
-                  width: 200,
-                  height: 200,
-                  margin: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 2, color: Colors.green),
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text(
-                          item['itemName'],
-                        ),
-                        Text(
-                          toCurrency(item['itemPrice']),
-                        ),
-                      ]),
+                lt.add(GestureDetector(
+                  onTap: () {
+                    int cnt = 1;
+                    int price = item['itemPrice'];
+
+                    //options 가공
+                    var options = item['options'];
+                    showDialog(
+                        context: context,
+                        builder: (context) =>
+                            StatefulBuilder(builder: (context, st) {
+                              return AlertDialog(
+                                title: ListTile(
+                                  title: Text('${item['itemName']}'),
+                                  subtitle: Text(
+                                    (toCurrency(price)),
+                                  ),
+                                  trailing: CartStepper(
+                                    value: cnt,
+                                    stepper: 1,
+                                    didChangeCount: (value) {
+                                      if (value > 0) {
+                                        st(() {
+                                          cnt = value;
+                                          price = item['itemPrice'] * cnt;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
+                                content: Text('$options'),
+                                actions: const [
+                                  Text('취소'),
+                                  Text('담기'),
+                                ],
+                              );
+                            }));
+                  },
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    margin: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        border: Border.all(width: 2, color: Colors.green),
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(5)),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(
+                            item['itemName'],
+                          ),
+                          Text(
+                            toCurrency(item['itemPrice']),
+                          ),
+                        ]),
+                  ),
                 ));
               }
               return Wrap(
@@ -188,8 +231,12 @@ class _MainState extends State<Main> {
         ],
       ),
       body: SlidingUpPanel(
+        minHeight: 65,
+        maxHeight: 600,
         controller: panelController,
-        panel: Container(),
+        panel: Container(
+          color: Colors.green,
+        ),
         body: Column(children: [
           categoryList,
           Expanded(child: itemList),
