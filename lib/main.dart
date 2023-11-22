@@ -129,7 +129,24 @@ class _MainState extends State<Main> {
                     int price = item['itemPrice'];
 
                     //options 가공
-                    var options = item['options'];
+                    List<dynamic> options = item['options'];
+                    List<Widget> datas = [];
+                    for (var option in options) {
+                      var values = option['optionValue'].toString().split('\n');
+                      datas.add(Column(
+                        children: [
+                          Text(option['optionName']),
+                          CustomRadioButton(
+                              buttonLables: values,
+                              buttonValues: values,
+                              radioButtonValue: (p0) {
+                                print(p0);
+                              },
+                              unSelectedColor: Colors.white,
+                              selectedColor: Colors.teal),
+                        ],
+                      ));
+                    }
                     showDialog(
                         context: context,
                         builder: (context) =>
@@ -153,7 +170,9 @@ class _MainState extends State<Main> {
                                     },
                                   ),
                                 ),
-                                content: Text('$options'),
+                                content: Column(
+                                  children: datas,
+                                ),
                                 actions: const [
                                   Text('취소'),
                                   Text('담기'),
