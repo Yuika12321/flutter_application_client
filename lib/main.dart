@@ -134,7 +134,7 @@ class _MainState extends State<Main> {
                           item['itemName'],
                         ),
                         Text(
-                          toCurrency(item['itemPrice'].to),
+                          toCurrency(item['itemPrice']),
                         ),
                       ]),
                 ));
