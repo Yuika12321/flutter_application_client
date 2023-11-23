@@ -79,6 +79,7 @@ class _MainState extends State<Main> {
               leading: IconButton(
                 onPressed: () {
                   orderList.removeAt(index);
+                  showOrderList();
                 },
                 icon: const Icon(Icons.close),
               ),
@@ -295,7 +296,7 @@ class _MainState extends State<Main> {
           Transform.translate(
             offset: const Offset(-10, 10),
             child: Badge(
-              label: const Text('1'),
+              label: Text('${orderList.length}'),
               child: IconButton(
                   onPressed: () {
                     if (panelController.isPanelClosed) {
@@ -315,13 +316,22 @@ class _MainState extends State<Main> {
         controller: panelController,
         // 장바구니 슬라이딩
         panel: Container(
-          color: Colors.green,
+          decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(40))),
           child: Column(
             children: [
               Container(
                 height: 65,
-                color: Colors.orange,
-                child: const Text('장바구니'),
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Colors.limeAccent,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                ),
+                child: const Center(
+                    child: Text(
+                  '장바구니',
+                )),
               ),
               Expanded(child: orderListView),
             ],
