@@ -53,9 +53,44 @@ class _MainState extends State<Main> {
 
   // 장바구니 컨트롤러
   PanelController panelController = PanelController();
+  int count = 1;
+  // 최종 주문 목록
+  var orderList = [];
+  dynamic orderListView = const Center(
+      child: Text(
+    'Nope',
+  ));
 
   String toCurrency(int n) {
     return NumberFormat.currency(locale: 'ko_KR', symbol: '₩').format(n);
+  }
+
+// 장바구니 목록 모기
+  void showOrderList() {
+    setState(() {
+      orderListView = ListView.separated(
+          itemBuilder: (context, index) {
+            var order = orderList[index];
+            var o = '';
+            for (var k in order['options'].keys) {
+              o = '$o$k:${order['options'][k]}\n';
+            }
+            return ListTile(
+              leading: IconButton(
+                onPressed: () {
+                  orderList.removeAt(index);
+                },
+                icon: const Icon(Icons.close),
+              ),
+              title: Text('${order['orderItem']} X ${order['orderQty']}'),
+              subtitle: Text(o),
+              trailing:
+                  Text(toCurrency(order['orderPrice'] * order['orderQty'])),
+            );
+          },
+          separatorBuilder: (context, index) => const Divider(),
+          itemCount: orderList.length);
+    });
   }
 
   // 카테고리 보기 기능
@@ -182,14 +217,22 @@ class _MainState extends State<Main> {
                                   children: datas,
                                 ),
                                 actions: [
-                                  const Text('취소'),
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('취소')),
                                   TextButton(
                                     onPressed: () {
                                       orderData['orderItem'] = item['itemName'];
                                       orderData['orderQty'] = cnt;
                                       orderData['options'] = optionData;
+                                      orderData['orderPrice'] =
+                                          item['itemPrice'];
 
-                                      print(orderData);
+                                      orderList.add(orderData);
+                                      showOrderList();
+                                      Navigator.pop(context);
                                     },
                                     child: const Text('담기'),
                                   ),
@@ -268,13 +311,26 @@ class _MainState extends State<Main> {
       ),
       body: SlidingUpPanel(
         minHeight: 65,
-        maxHeight: 600,
+        maxHeight: 750,
         controller: panelController,
+        // 장바구니 슬라이딩
         panel: Container(
           color: Colors.green,
+          child: Column(
+            children: [
+              Container(
+                height: 65,
+                color: Colors.orange,
+                child: const Text('장바구니'),
+              ),
+              Expanded(child: orderListView),
+            ],
+          ),
         ),
         body: Column(children: [
+          // 카테고리 목록
           categoryList,
+          // 아이템
           Expanded(child: itemList),
         ]),
       ),
