@@ -272,7 +272,14 @@ class _MainState extends State<Main> {
       );
     });
   }
-  // 장바구니 기능
+
+  // 장바구니 초기화
+  void clearOrder() {
+    setState(() {
+      orderList.clear();
+      showOrderList();
+    });
+  }
 
   @override
   void initState() {
@@ -366,14 +373,17 @@ class _MainState extends State<Main> {
                                     ],
                                   ));
                           if (result != null) {
+                            var t = result;
                             // 결제가 완료되어 다음 페이지에서 주문 번호를 받는다.
-                            Navigator.push(
+                            // ignore: use_build_context_synchronously
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    OrderResult(orderResult: result),
+                                    OrderResult(orderResult: t),
                               ),
                             );
+                            clearOrder();
                           }
                         },
                   child: const Text('결제하기'))

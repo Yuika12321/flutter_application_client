@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 
 String orderCollectionName = 'cafe_order';
 var firestore = FirebaseFirestore.instance;
@@ -15,6 +16,8 @@ class OrderResult extends StatefulWidget {
 
 class _OrderResultState extends State<OrderResult> {
   late Map<String, dynamic> orderResult;
+  dynamic resultView = const Text('주문중 . . . ');
+  int duration = 10;
 
   Future<int> getOrderNumber() async {
     //가장 마지막 번호
@@ -39,6 +42,7 @@ class _OrderResultState extends State<OrderResult> {
     } catch (e) {
       number = 1;
     }
+    print(number);
     return number;
   }
 
@@ -46,7 +50,42 @@ class _OrderResultState extends State<OrderResult> {
     int number = await getOrderNumber();
     orderResult['orderNumber'] = number;
     orderResult['orderTime'] = Timestamp.fromDate(DateTime.now());
-    firestore.collection(orderCollectionName).add(orderResult);
+    await firestore
+        .collection(orderCollectionName)
+        .add(orderResult)
+        .then((value) {
+      print('ok');
+
+      // 화면 꾸미기
+      showResult(number);
+      return null;
+    }).onError((error, stackTrace) {
+      print('error');
+      return null;
+    });
+  }
+
+  void showResult(int number) {
+    setState(() {
+      resultView = Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text('주문 완료.'),
+          Text('주문 번호는 $number번 입니다.'),
+          Text('$duration초 후에 창이 닫힙니다.'),
+          CircularCountDownTimer(
+              isReverse: true,
+              onComplete: () {
+                Navigator.pop(context);
+              },
+              width: 50,
+              height: 50,
+              duration: duration,
+              fillColor: Colors.blue,
+              ringColor: Colors.red),
+        ],
+      );
+    });
   }
 
   @override
@@ -57,7 +96,7 @@ class _OrderResultState extends State<OrderResult> {
     orderResult = widget.orderResult;
 
     // 현재 주문번호를 설정
-    getOrderNumber();
+    setOrder();
     // 오늘을 기준으로 여태까지 개수 10건 -> 11번, 만약 한 건도 없으면 1번
 
     //주문번호, 시간포함, 데이터 저장
@@ -66,7 +105,10 @@ class _OrderResultState extends State<OrderResult> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Text(orderResult.toString()),
+      appBar: AppBar(
+        title: const Text('고맙다.'),
+      ),
+      body: resultView,
     );
   }
 }
