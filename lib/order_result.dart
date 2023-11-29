@@ -50,6 +50,7 @@ class _OrderResultState extends State<OrderResult> {
     int number = await getOrderNumber();
     orderResult['orderNumber'] = number;
     orderResult['orderTime'] = Timestamp.fromDate(DateTime.now());
+    orderResult['orderComplete'] = false;
     await firestore
         .collection(orderCollectionName)
         .add(orderResult)
